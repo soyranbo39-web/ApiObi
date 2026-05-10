@@ -8,4 +8,4 @@ class SensorReading:
     hum: float
     co2: int
     dispositivo: str
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
