@@ -6,3 +6,5 @@ class DatosIn(BaseModel):
     hum: float
     co2: int
     dispositivo: str
+    riego: str | None = None
+    ventilador: str | None = None

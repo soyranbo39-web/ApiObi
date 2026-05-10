@@ -1,3 +1,4 @@
+import fastapi
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
@@ -86,6 +87,10 @@ def create_app() -> FastAPI:
         body = body.replace("</body>", f"{_SWAGGER_JS}</body>")
         return HTMLResponse(body)
 
+    @app.get("/health")
+    def health() -> dict[str, str]:
+        return {"status": "ok"}
+
     app.include_router(auth_router)
 
     for router in [datos_router, estado_router, historial_router, control_router, comandos_router]:
@@ -98,4 +103,5 @@ app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=False)
+    
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
