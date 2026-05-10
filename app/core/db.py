@@ -39,8 +39,16 @@ def init_db() -> None:
     from app.model.app_state_orm import AppStateORM
     from app.model.command_orm import CommandORM  # noqa: F401
     from app.model.sensor_reading_orm import SensorReadingORM  # noqa: F401
+    from app.model.user_orm import UserORM  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
+
+    with engine.begin() as conn:
+        conn.exec_driver_sql("PRAGMA journal_mode=WAL;")
+        conn.exec_driver_sql("PRAGMA synchronous=NORMAL;")
+        conn.exec_driver_sql("PRAGMA cache_size=-32000;")
+        conn.exec_driver_sql("PRAGMA temp_store=MEMORY;")
+        conn.exec_driver_sql("PRAGMA busy_timeout=5000;")
 
     with SessionLocal() as db:
         if db.get(AppStateORM, "modo") is None:

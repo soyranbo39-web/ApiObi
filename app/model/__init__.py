@@ -5,6 +5,7 @@ from .command import Command
 from .command_orm import CommandORM
 from .sensor_reading import SensorReading
 from .sensor_reading_orm import SensorReadingORM
+from .user_orm import UserORM
 
 __all__ = [
 	"SensorReading",
@@ -14,4 +15,5 @@ __all__ = [
 	"CommandORM",
 	"ActuatorStateORM",
 	"AppStateORM",
+	"UserORM",
 ]

@@ -10,20 +10,33 @@ from app.model.sensor_reading_orm import SensorReadingORM
 
 
 class SensorRepository:
-	def _ensure_defaults(self, db) -> None:
-		if db.get(AppStateORM, "modo") is None:
-			db.add(AppStateORM(key="modo", value="automatico"))
+	def estado_completo(self):
+		"""Devuelve estado de sensores, actuadores y modo en una sola sesión DB."""
+		with SessionLocal() as db:
+			ultima = db.execute(
+				select(SensorReadingORM).order_by(SensorReadingORM.id.desc())
+			).scalars().first()
 
-		for actuator_name in VALID_ACTUATORS:
-			if db.get(ActuatorStateORM, actuator_name) is None:
-				db.add(ActuatorStateORM(name=actuator_name, state="OFF"))
+			actuators = list(db.execute(select(ActuatorStateORM)).scalars())
+			mode = db.get(AppStateORM, "modo")
 
-		db.commit()
+		sensores = {}
+		ultimo_update = None
+		if ultima:
+			sensores = {"temp": ultima.temp, "hum": ultima.hum, "co2": ultima.co2}
+			if ultima.timestamp:
+				ultimo_update = ultima.timestamp.isoformat()
+
+		return {
+			"sensores": sensores,
+			"actuadores": {a.name: a.state for a in actuators},
+			"modo": mode.value if mode else "automatico",
+			"ultimo_update": ultimo_update,
+		}
 
 	def guardar_lectura(self, reading) -> SensorReadingORM:
 		payload = reading.model_dump() if hasattr(reading, "model_dump") else asdict(reading) if is_dataclass(reading) else dict(reading)
 		with SessionLocal() as db:
-			self._ensure_defaults(db)
 			sensor_reading = SensorReadingORM(**payload)
 			db.add(sensor_reading)
 			db.commit()
@@ -54,7 +67,6 @@ class SensorRepository:
 			return
 
 		with SessionLocal() as db:
-			self._ensure_defaults(db)
 			actuator = db.get(ActuatorStateORM, nombre)
 			if actuator:
 				actuator.state = estado
@@ -62,14 +74,12 @@ class SensorRepository:
 
 	def estado_actuadores(self):
 		with SessionLocal() as db:
-			self._ensure_defaults(db)
 			actuators = list(db.execute(select(ActuatorStateORM)).scalars())
 			return {actuator.name: actuator.state for actuator in actuators}
 
 	@property
 	def modo(self):
 		with SessionLocal() as db:
-			self._ensure_defaults(db)
 			mode = db.get(AppStateORM, "modo")
 			return mode.value if mode else "automatico"
 
@@ -78,7 +88,6 @@ class SensorRepository:
 			return
 
 		with SessionLocal() as db:
-			self._ensure_defaults(db)
 			mode = db.get(AppStateORM, "modo")
 			if mode:
 				mode.value = modo
