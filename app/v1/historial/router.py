@@ -11,7 +11,7 @@ repo             = SensorRepository()
 
 @historial_router.get("/historial")
 def obtener_historial(
-    limit: Annotated[int, Query(default=DEFAULT_HISTORIAL_LIMIT, ge=1, le=MAX_HISTORIAL)]
+    limit: Annotated[int, Query(ge=1, le=MAX_HISTORIAL)] = DEFAULT_HISTORIAL_LIMIT,
 ):
     lecturas = repo.historial(limit)
     return {"total": len(lecturas), "lecturas": lecturas}
