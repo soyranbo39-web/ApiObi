@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: apiobi
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: ./start.sh
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: AUTH_SECRET_KEY
+        generateValue: true
+      - key: API_KEY_VALUE
+        generateValue: true
