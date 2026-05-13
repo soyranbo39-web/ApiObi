@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: apiobi
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: AUTH_SECRET_KEY
+        generateValue: true
+      - key: API_KEY_VALUE
+        generateValue: true

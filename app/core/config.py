@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-MAX_HISTORIAL = 100
+MAX_HISTORIAL = 1000
 DEFAULT_HISTORIAL_LIMIT = 50
 
 BASE_DIR = Path(__file__).resolve().parents[2]

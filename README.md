@@ -1,39 +1,46 @@
 # ApiObi
-fastapi dev app/main.py --host 0.0.0.0 --port 8000    
 
-## Seguridad
+## Documentacion en Render
 
-La API requiere API Key en todos los endpoints.
+Cuando el servicio este desplegado en Render, la documentacion de la API se puede abrir en:
 
-- Header por defecto: `X-API-Key`
-- Valor por defecto: `cambiar-esta-api-key`
+- `https://<tu-servicio>.onrender.com/docs`
+- `https://<tu-servicio>.onrender.com/openapi.json`
 
-Puedes cambiar ambos con variables de entorno:
+Tambien hay un endpoint de salud para validar que el deploy esta activo:
 
-- `API_KEY_HEADER_NAME`
-- `API_KEY_VALUE`
+- `https://<tu-servicio>.onrender.com/health`
 
-## Configuracion para ESP32
+## Ver el historial de lecturas
 
-Levanta la API escuchando en la red local (no solo localhost):
+El historial esta disponible en el endpoint protegido:
+
+- `GET /historial`
+
+Parametro disponible:
+
+- `limit` (opcional): cantidad de lecturas a devolver.
+	- Minimo: `1`
+	- Maximo: `100`
+	- Default: `50`
+
+### Flujo recomendado en Render (Swagger)
+
+1. Abre `https://<tu-servicio>.onrender.com/docs`.
+2. Registra usuario en `POST /auth/register` (si aun no existe).
+3. Inicia sesion en `POST /auth/token` para obtener `access_token`.
+4. Haz clic en `Authorize` y pega el token.
+5. Ejecuta `GET /historial`.
+
+### Ejemplo con cURL
 
 ```bash
-fastapi dev app/main.py --host 0.0.0.0 --port 8000
+# 1) Obtener token
+curl -X POST "https://<tu-servicio>.onrender.com/auth/token" \
+	-H "Content-Type: application/x-www-form-urlencoded" \
+	-d "username=tu_usuario&password=tu_password"
+
+# 2) Consultar historial
+curl "https://<tu-servicio>.onrender.com/historial?limit=20" \
+	-H "Authorization: Bearer <access_token>"
 ```
-
-Base URL en firmware (ejemplo):
-
-- `http://192.168.50.211:8000`
-
-Pruebas rapidas desde la misma red:
-
-```bash
-curl http://192.168.50.211:8000/health
-curl -X POST http://192.168.50.211:8000/auth/token -H "Content-Type: application/x-www-form-urlencoded" -d "username=admin&password=123456"
-```
-
-Si no conecta:
-
-- Verifica que el servidor este corriendo con `--host 0.0.0.0`.
-- Verifica que el puerto `8000` no este bloqueado por firewall.
-- Asegura que ESP32 y PC esten en la misma red/subred.
