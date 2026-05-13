@@ -93,8 +93,12 @@ def create_app() -> FastAPI:
 
     app.include_router(auth_router)
 
+
+    from app.v1.historial.ws import ws_router
+    app.include_router(ws_router)
+
     for router in [datos_router, estado_router, historial_router, control_router, comandos_router]:
-        app.include_router(router, dependencies=[Depends(require_authenticated_user)])
+      app.include_router(router, dependencies=[Depends(require_authenticated_user)])
 
     return app
 
