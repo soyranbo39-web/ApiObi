@@ -12,7 +12,7 @@ async def websocket_historial(websocket: WebSocket):
         last_timestamp = None
         while True:
           
-            lecturas = repo.historial(999999999)  # Un número muy grande para no limitar
+            lecturas = repo.historial()  # Sin límite
             if lecturas:
                 current_last = lecturas[-1]["timestamp"]
                 if current_last != last_timestamp:

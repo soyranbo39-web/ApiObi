@@ -49,13 +49,12 @@ class SensorRepository:
 				select(SensorReadingORM).order_by(SensorReadingORM.id.desc())
 			).scalars().first()
 
-	def historial(self, limit: int):
+	def historial(self):
 		with SessionLocal() as db:
 			readings = list(
 				db.execute(
 					select(SensorReadingORM)
 					.order_by(SensorReadingORM.id.desc())
-					.limit(limit)
 				).scalars()
 			)
 			readings.reverse()
